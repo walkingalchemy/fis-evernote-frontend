@@ -13,6 +13,7 @@ class Note {
       container.innerHTML = ''
       let div = document.createElement('div')
       div.className = 'note-card'
+      div.id = 'current' + this.id
       let title = document.createElement('h3')
       title.innerText = this.title
       let body = document.createElement('p')
@@ -32,7 +33,7 @@ class Note {
       body.innerText = this.body.slice(0,75) + '...'
       noteDiv.appendChild(title)
       noteDiv.appendChild(body)
-      div.appendChild(noteDiv)
+      div.prepend(noteDiv)
     }
 
   }

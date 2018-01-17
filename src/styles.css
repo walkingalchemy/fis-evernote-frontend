@@ -9,3 +9,7 @@
 .note-stub:hover {
   background-color: lightgray;
 }
+
+#vertical-edit {
+  text-align: center;
+}

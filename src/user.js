@@ -11,12 +11,12 @@ class User {
 
     renderNotePreviews(){
       let notes = this.notes()
-      let mainDiv = document.getElementById('note-list')
+      let noteListDiv = document.getElementById('note-list')
       let head = document.createElement('h2')
       head.innerText = this.name + "'s Notes"
-      mainDiv.appendChild(head)
+      noteListDiv.appendChild(head)
       for (const note of notes) {
-        note.renderPreview(mainDiv)
+        note.renderPreview(noteListDiv)
       }
     }
 
