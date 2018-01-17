@@ -16,7 +16,11 @@ document.addEventListener('DOMContentLoaded', function(event){
       for (const note of res['notes']) {
         new Note(note).renderPreview(noteList)
       }
+      store.notes[`${store.notes.length -1}`].render()
     })
+
+
+  //set event listeners
 
   let plus = document.getElementById('new-note')
   plus.addEventListener('click', handlePlusClick)
@@ -27,8 +31,11 @@ document.addEventListener('DOMContentLoaded', function(event){
   let list = document.querySelector('#note-list')
   list.addEventListener('click', handleNoteListClick)
 
+  let deletor = document.getElementById('delete-note')
+  deletor.addEventListener('click', handleDeletorClick)
 
-  //handlers
+
+  //click handlers
   function handleNoteListClick(event) {
     let ident = parseInt(event.path.find( el => el.className === 'note-stub').id.slice(4))
     store.notes.find( note => note.id === ident).render()
@@ -83,6 +90,29 @@ document.addEventListener('DOMContentLoaded', function(event){
     currentNote.appendChild(div)
     editNoteForm.addEventListener('submit', handleEditSubmit)
   }
+
+  function handleDeletorClick() {
+    let currentNoteId = document.querySelector('.note-card').id.slice(7)
+    let URL = "http://localhost:3000/api/v1/notes/" + currentNoteId
+
+    fetch(URL, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+    })
+    .then(res => res.json())
+    .then(json => {
+      const note = store.notes.find(n => n.id === json.noteId)
+      store.notes.splice(store.notes.indexOf(note), 1)
+      document.getElementById('note' + json.noteId).remove()
+      currentNote.innerHTML = "<h2> Successfully Deleted!</h2>"
+    })
+  }
+
+
+  //submit handlers
 
   function handleNoteSubmit(event) {
     event.preventDefault()
