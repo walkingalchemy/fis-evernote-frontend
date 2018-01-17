@@ -19,4 +19,8 @@ document.addEventListener('DOMContentLoaded', function(event){
   sqrl.renderNoteList()
   sqrl.notes()[0].render()
 
+  // document.getQuerySelectorAll('.note-stub').forEach(function(note) {
+  //   note.addEventListener('click', function(){
+  // })
+
 })
