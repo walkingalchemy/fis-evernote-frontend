@@ -17,5 +17,6 @@ document.addEventListener('DOMContentLoaded', function(event){
   new Note('I like seeds', 'These damn things are so damn crunchy.  Now where the hell did I leave that birdfeeder?', sqrl)
 
   sqrl.renderNoteList()
+  sqrl.notes()[0].render()
 
 })
