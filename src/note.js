@@ -13,7 +13,7 @@ class Note {
       container.innerHTML = ''
       let div = document.createElement('div')
       div.className = 'note-card'
-      div.id = 'current' + this.id
+      div.dataset.id = this.id
       let title = document.createElement('h3')
       title.innerText = this.title
       let body = document.createElement('p')
