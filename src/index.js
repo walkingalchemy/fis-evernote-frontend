@@ -4,46 +4,93 @@ const store = {
 }
 
 
-document.addEventListener('DOMContentLoaded', function(event){
-  let vertical = document.getElementById('vertical-edit')
-  let noteList = document.getElementById('note-list')
-  let currentNote = document.getElementById('current-note')
+class App {
+  static init() {
 
-  fetch('http://localhost:3000/api/v1/users/1')
-    .then( res => res.json() )
-    .then( function(res) {
-      new User(res)
-      for (const note of res['notes']) {
-        new Note(note).renderPreview(noteList)
-      }
-      store.notes[`${store.notes.length -1}`].render()
-    })
+    App.loadNotes()
 
+    let plus = document.getElementById('new-note')
+    plus.addEventListener('click', App.handlePlusClick)
 
-  //set event listeners
+    let editor = document.getElementById('edit-note')
+    editor.addEventListener('click', App.handleEditorClick)
 
-  let plus = document.getElementById('new-note')
-  plus.addEventListener('click', handlePlusClick)
+    let list = document.querySelector('#note-list')
+    list.addEventListener('click', App.handleNoteListClick)
 
-  let editor = document.getElementById('edit-note')
-  editor.addEventListener('click', handleEditorClick)
+    let deletor = document.getElementById('delete-note')
+    deletor.addEventListener('click', App.handleDeletorClick)
 
-  let list = document.querySelector('#note-list')
-  list.addEventListener('click', handleNoteListClick)
+  }
 
-  let deletor = document.getElementById('delete-note')
-  deletor.addEventListener('click', handleDeletorClick)
+  static loadNotes() {
+    let noteList = document.getElementById('note-list')
+    fetch('http://localhost:3000/api/v1/users/1')
+      .then( res => res.json() )
+      .then( function(res) {
+        for (const note of res['notes']) {
+          new Note(note).renderPreview(noteList)
+        }
+        store.notes[`${store.notes.length -1}`].render()
+      })
+  }
 
-
-  //click handlers
-  function handleNoteListClick(event) {
-    let ident = parseInt(event.path.find( el => el.className === 'note-stub').id.slice(4))
-    store.notes.find( note => note.id === ident).render()
+  static handleNoteListClick(event) {
+    //find the note that was clicked and render it to the current note
+    let ident = event.path.find( el => el.className === 'note-stub').dataset.id
+    store.notes.find( note => note.id === parseInt(ident)).render()
+    // remove the elements that are not currently available
     let tilda = document.getElementById('edit-note')
     tilda.style.display = 'inherit'
     let minus = document.getElementById('delete-note')
     minus.style.display = 'inherit'
   }
+
+
+}
+document.addEventListener('DOMContentLoaded', App.init)
+
+
+document.addEventListener('DOMContentLoaded', function(event){
+  let vertical = document.getElementById('vertical-edit')
+  let noteList = document.getElementById('note-list')
+  let currentNote = document.getElementById('current-note')
+
+  // fetch('http://localhost:3000/api/v1/users/1')
+  //   .then( res => res.json() )
+  //   .then( function(res) {
+  //     new User(res)
+  //     for (const note of res['notes']) {
+  //       new Note(note).renderPreview(noteList)
+  //     }
+  //     store.notes[`${store.notes.length -1}`].render()
+  //   })
+
+
+  //set event listeners
+
+  // let plus = document.getElementById('new-note')
+  // plus.addEventListener('click', handlePlusClick)
+  //
+  // let editor = document.getElementById('edit-note')
+  // editor.addEventListener('click', handleEditorClick)
+  //
+  // let list = document.querySelector('#note-list')
+  // list.addEventListener('click', handleNoteListClick)
+  //
+  // let deletor = document.getElementById('delete-note')
+  // deletor.addEventListener('click', handleDeletorClick)
+
+
+  //click handlers
+  // function handleNoteListClick(event) {
+  //   let ident = parseInt(event.path.find( el => el.className === 'note-stub').id.slice(4))
+  //   store.notes.find( note => note.id === ident).render()
+  //   let tilda = document.getElementById('edit-note')
+  //   tilda.style.display = 'inherit'
+  //   let minus = document.getElementById('delete-note')
+  //   minus.style.display = 'inherit'
+  // }
 
   function handlePlusClick(event) {
     let tilda = document.getElementById('edit-note')

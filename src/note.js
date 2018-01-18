@@ -25,7 +25,7 @@ class Note {
 
     renderPreview(div){
       let noteDiv = document.createElement('div')
-      noteDiv.id = 'note' + this.id
+      noteDiv.dataset.id = this.id
       noteDiv.className = 'note-stub'
       let title = document.createElement('h4')
       title.innerText = this.title
