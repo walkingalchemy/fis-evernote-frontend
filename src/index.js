@@ -9,8 +9,8 @@ class App {
 
     App.loadNotes()
 
-    let plus = document.getElementById('new-note')
-    plus.addEventListener('click', App.handlePlusClick)
+    let creator = document.getElementById('new-note')
+    creator.addEventListener('click', App.handleCreatorClick)
 
     let editor = document.getElementById('edit-note')
     editor.addEventListener('click', App.handleEditorClick)
@@ -24,30 +24,101 @@ class App {
   }
 
   static loadNotes() {
+    //get note list container
     let noteList = document.getElementById('note-list')
+    // request all of a user's notes from backend
     fetch('http://localhost:3000/api/v1/users/1')
       .then( res => res.json() )
       .then( function(res) {
+        // instantiate each note returned from backend into a frontend note and
+        // render to list container
         for (const note of res['notes']) {
           new Note(note).renderPreview(noteList)
         }
+        // render latest note to current note container
         store.notes[`${store.notes.length -1}`].render()
       })
   }
+
+
+  // CLICK HANDLERS
 
   static handleNoteListClick(event) {
     //find the note that was clicked and render it to the current note
     let ident = event.path.find( el => el.className === 'note-stub').dataset.id
     store.notes.find( note => note.id === parseInt(ident)).render()
-    // remove the elements that are not currently available
+    // hide the elements that are not currently available
     let tilda = document.getElementById('edit-note')
     tilda.style.display = 'inherit'
     let minus = document.getElementById('delete-note')
     minus.style.display = 'inherit'
   }
 
+  static handleCreatorClick(event) {
+    // hide the elements that are not currently available
+    let tilda = document.getElementById('edit-note')
+    tilda.style.display = 'none'
+    let minus = document.getElementById('delete-note')
+    minus.style.display = 'none'
+    // render new note form
+    let div = document.createElement('div')
+    div.className = 'note-card'
+    let newNoteForm = document.createElement('form')
+    newNoteForm.innerHTML = `
+      <label for="new-note-title">Title:</label>
+      <input type="text" id="new-note-title" name="new-note-title" placeholder="Title">
+      <label for="new-note-body">Note:</label>
+      <input type="text" id="new-note-body" name="new-note-body" placeholder="Type here...">
+      <input type="submit" value="Create New Note" id="note-submit">`
+    div.appendChild(newNoteForm)
+    // clear current note container
+    const currentNote = document.getElementById('current-note')
+    currentNote.innerHTML = ''
+    // add new note form to current note container
+    currentNote.appendChild(div)
+    // add event listener to new note form on submit
+    newNoteForm.addEventListener('submit', App.handleNoteSubmit)
+  }
+
+
+  // SUBMIT HANDLERS
+
+  static handleNoteSubmit(event) {
+    // prevent default behavior on form submit
+    event.preventDefault()
+    // get form values
+    const noteTitle = document.getElementById('new-note-title').value
+    const noteBody = document.getElementById('new-note-body').value
+    // get list container
+    let noteList = document.getElementById('note-list')
+    // post form contents to new note route
+    fetch('http://localhost:3000/api/v1/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        title: noteTitle,
+        body: noteBody,
+        user_id: 1
+      })
+    })
+    // parse json return
+    .then(res => res.json())
+    // use json to create a new note and display it in the current note and list
+    .then(json => {
+      const note = new Note(json)
+      note.render()
+      note.renderPreview(noteList)
+    })
+  }
+
+
 
 }
+
+
 document.addEventListener('DOMContentLoaded', App.init)
 
 
@@ -92,25 +163,25 @@ document.addEventListener('DOMContentLoaded', function(event){
   //   minus.style.display = 'inherit'
   // }
 
-  function handlePlusClick(event) {
-    let tilda = document.getElementById('edit-note')
-    tilda.style.display = 'none'
-    let minus = document.getElementById('delete-note')
-    minus.style.display = 'none'
-    currentNote.innerHTML = ''
-    let div = document.createElement('div')
-    div.className = 'note-card'
-    let newNoteForm = document.createElement('form')
-    newNoteForm.innerHTML = `
-      <label for="new-note-title">Title:</label>
-      <input type="text" id="new-note-title" name="new-note-title" placeholder="Title">
-      <label for="new-note-body">Note:</label>
-      <input type="text" id="new-note-body" name="new-note-body" placeholder="Type here...">
-      <input type="submit" value="Create New Note" id="note-submit">`
-    div.appendChild(newNoteForm)
-    currentNote.appendChild(div)
-    newNoteForm.addEventListener('submit', handleNoteSubmit)
-  }
+  // function handlePlusClick(event) {
+  //   let tilda = document.getElementById('edit-note')
+  //   tilda.style.display = 'none'
+  //   let minus = document.getElementById('delete-note')
+  //   minus.style.display = 'none'
+  //   currentNote.innerHTML = ''
+  //   let div = document.createElement('div')
+  //   div.className = 'note-card'
+  //   let newNoteForm = document.createElement('form')
+  //   newNoteForm.innerHTML = `
+  //     <label for="new-note-title">Title:</label>
+  //     <input type="text" id="new-note-title" name="new-note-title" placeholder="Title">
+  //     <label for="new-note-body">Note:</label>
+  //     <input type="text" id="new-note-body" name="new-note-body" placeholder="Type here...">
+  //     <input type="submit" value="Create New Note" id="note-submit">`
+  //   div.appendChild(newNoteForm)
+  //   currentNote.appendChild(div)
+  //   newNoteForm.addEventListener('submit', handleNoteSubmit)
+  // }
 
   function handleEditorClick() {
     let tilda = document.getElementById('edit-note')
@@ -161,32 +232,32 @@ document.addEventListener('DOMContentLoaded', function(event){
 
   //submit handlers
 
-  function handleNoteSubmit(event) {
-    event.preventDefault()
-    const inputTitle = document.getElementById('new-note-title')
-    let noteTitle = inputTitle.value
-    const inputBody = document.getElementById('new-note-body')
-    let noteBody = inputBody.value
-
-    fetch('http://localhost:3000/api/v1/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        title: noteTitle,
-        body: noteBody,
-        user_id: 1
-      })
-    })
-    .then(res => res.json())
-    .then(json => {
-      const note = new Note(json)
-      note.render()
-      note.renderPreview(noteList)
-    })
-  }
+  // function handleNoteSubmit(event) {
+  //   event.preventDefault()
+  //   const inputTitle = document.getElementById('new-note-title')
+  //   let noteTitle = inputTitle.value
+  //   const inputBody = document.getElementById('new-note-body')
+  //   let noteBody = inputBody.value
+  //
+  //   fetch('http://localhost:3000/api/v1/notes', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Accept': 'application/json'
+  //     },
+  //     body: JSON.stringify({
+  //       title: noteTitle,
+  //       body: noteBody,
+  //       user_id: 1
+  //     })
+  //   })
+  //   .then(res => res.json())
+  //   .then(json => {
+  //     const note = new Note(json)
+  //     note.render()
+  //     note.renderPreview(noteList)
+  //   })
+  // }
 
   function handleEditSubmit(event) {
     event.preventDefault()
