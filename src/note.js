@@ -1,10 +1,12 @@
-class Note {
+const Note = (() => {
+  let all = [];
+  return class Note {
     constructor({id, title, body, user}){
       this.id = id
       this.title = title
       this.body = body
       if (user) {this.user = user}
-      store.notes.push(this)
+      all.push(this)
     }
 
 
@@ -36,4 +38,10 @@ class Note {
       div.prepend(noteDiv)
     }
 
+    static all() {
+      return [...all]
+    }
+
   }
+
+})()

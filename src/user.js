@@ -1,12 +1,17 @@
-class User {
+
+const User = (() => {
+  let all = [];
+
+  return class User {
+
     constructor({id,name}){
       this.id = id
       this.name = name
-      store.users.push(this)
+      all.push(this)
     }
 
     notes() {
-      return store.notes.filter(note => { return note.user === this})
+      return Note.all().filter(note => { return note.user === this})
     }
 
     renderNotePreviews(){
@@ -20,5 +25,10 @@ class User {
       }
     }
 
+    static all() {
+      return [...all]
+    }
 
   }
+
+})()

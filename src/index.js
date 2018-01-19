@@ -1,3 +1,3 @@
-const store = { users: [], notes: [] }
+// const store = { users: [], notes: [] }
 
 document.addEventListener('DOMContentLoaded', App.init);
